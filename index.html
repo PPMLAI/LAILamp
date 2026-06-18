@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Pemeriksaan Penerangan LAI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
+        .card { border: none; border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+        .header-title { background: linear-gradient(135deg, #0d47a1 0%, #1976d2 100%); color: white; padding: 25px; border-radius: 15px 15px 0 0; text-align: center; }
+        .btn-submit { background: #0d47a1; color: white; font-weight: bold; border-radius: 8px; transition: 0.3s; }
+        .btn-submit:hover { background: #1565c0; transform: translateY(-2px); color: white; }
+        .form-label { font-weight: 600; color: #444; }
+        #loading { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card">
+                <div class="header-title">
+                    <h4 class="mb-1">Pemeriksaan Rutin Penerangan</h4>
+                    <p class="mb-0 opacity-75">Gedung Lembaga Alkitab Indonesia</p>
+                </div>
+                <div class="card-body p-4">
+                    
+                    <form id="formPenerangan" onsubmit="handleFormSubmit(this); return false;">
+                        
+                        <div class="mb-3">
+                            <label for="petugas" class="form-label">Nama Petugas</label>
+                            <input type="text" class="form-control" id="petugas" name="petugas" placeholder="Ketik nama petugas..." required>
+                        </div>
+
+                        <!-- INPUT BARU: Tanggal Pemeriksaan -->
+                        <div class="mb-3">
+                            <label for="tanggal" class="form-label">Tanggal Pemeriksaan</label>
+                            <input type="date" class="form-control" id="tanggal" name="tanggal" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="area" class="form-label">Area / Ruangan</label>
+                            <select class="form-select" id="area" name="area" required>
+                                <option value="" disabled selected>-- Pilih Area --</option>
+                                <option value="Lantai 2 Ruang Staff">Lantai 2 Ruang Staff</option>
+                                <option value="Aula">Aula</option>
+                                <option value="Pracetak">Pracetak</option>
+                                <option value="Repro">Repro</option>
+                                <option value="Ruang Produksi">Ruang Produksi</option>
+                                <option value="Toilet Loker Pria dan Wanita">Toilet Loker Pria dan Wanita</option>
+                                <option value="Toilet Produksi BL500">Toilet Produksi BL500</option>
+                                <option value="Toilet Produksi Stahlfolder">Toilet Produksi Stahlfolder</option>
+                                <option value="Parkiran Motor Depan dan Belakang">Parkiran Motor Depan dan Belakang</option>
+                                <option value="Kantin dan Guest House">Kantin dan Guest House</option>
+                                <option value="Gudang Bahan Baku">Gudang Bahan Baku</option>
+                                <option value="Gudang Barang Jadi">Gudang Barang Jadi</option>
+                                <option value="Genset dan Kompresor">Genset dan Kompresor</option>
+                                <option value="Area Luar Gedung">Area Luar Gedung</option>
+                                <option value="Resepsionis">Resepsionis</option>
+                                <option value="Pos Sekurity">Pos Sekurity</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="jenisLampu" class="form-label">Jenis Lampu</label>
+                            <select class="form-select" id="jenisLampu" name="jenisLampu" required>
+                                <option value="" disabled selected>-- Pilih Jenis Lampu --</option>
+                                <option value="TL LED">TL LED</option>
+                                <option value="Bohlam LED">Bohlam LED</option>
+                                <option value="Lainnya">Lainnya / Sensor</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label d-block">Status Penerangan</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="status" id="statusNormal" value="Normal" checked>
+                                <label class="form-check-label text-success" for="statusNormal">Normal / Menyala</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="status" id="statusRusak" value="Rusak / Mati">
+                                <label class="form-check-label text-danger" for="statusRusak">Rusak / Mati</label>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="keterangan" class="form-label">Keterangan / Detail Laporan</label>
+                            <textarea class="form-control" id="keterangan" name="keterangan" rows="3" placeholder="Contoh: Lampu mati di baris ke-2 atau 'Aman'"></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" id="btnSubmit" class="btn btn-submit py-2">Kirim Laporan</button>
+                        </div>
+
+                        <div id="loading" class="text-center mt-3">
+                            <div class="spinner-border text-primary" role="status"></div>
+                            <p class="text-muted small mt-2">Menyimpan laporan, mohon tunggu...</p>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function handleFormSubmit(formObject) {
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('btnSubmit').disabled = true;
+
+        // 1. Ambil data dari form
+        var formData = {
+            petugas: formObject.petugas.value,
+            tanggal: formObject.tanggal.value,
+            area: formObject.area.value,
+            jenisLampu: formObject.jenisLampu.value,
+            status: formObject.status.value,
+            keterangan: formObject.keterangan.value || "Aman"
+        };
+
+        // 2. URL Web App Apps Script Anda
+        var webAppUrl = "https://script.google.com/macros/s/AKfycby9qw2E8Jtv6Nmo5yDhS6RrATbttC5_QOHApRUryzHWdeLQJann2e_tVqvwY3x7G2v6/exec";
+
+        // 3. Kirim data menggunakan Fetch API (POST)
+        fetch(webAppUrl, {
+            method: "POST",
+            mode: "no-cors", // Dibutuhkan agar tidak terkena block CORS dari Google
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(function() {
+            // Karena menggunakan mode: "no-cors", kita tidak bisa membaca return json dari Google,
+            // tapi jika tidak ada error di catch, berarti data berhasil terkirim.
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('btnSubmit').disabled = false;
+            
+            alert('Berhasil! Laporan telah dikirim.');
+            formObject.reset();
+        })
+        .catch(function(error) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('btnSubmit').disabled = false;
+            alert('Gagal sistem: ' + error);
+        });
+    }
+</script>
+
+</body>
+</html>
