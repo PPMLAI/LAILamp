@@ -12,6 +12,7 @@
         .btn-submit:hover { background: #1565c0; transform: translateY(-2px); color: white; }
         .form-label { font-weight: 600; color: #444; }
         #loading { display: none; }
+        .footer-text { text-align: center; color: #777; font-size: 0.85rem; margin-top: 25px; font-weight: 500; letter-spacing: 0.5px; }
     </style>
 </head>
 <body>
@@ -30,10 +31,17 @@
                         
                         <div class="mb-3">
                             <label for="petugas" class="form-label">Nama Petugas</label>
-                            <input type="text" class="form-control" id="petugas" name="petugas" placeholder="Ketik nama petugas..." required>
+                            <select class="form-select" id="petugas" name="petugas" required>
+                                <option value="" disabled selected>-- Pilih Nama Petugas --</option>
+                                <option value="Supriyadi">Supriyadi</option>
+                                <option value="Timur Sukoco">Timur Sukoco</option>
+                                <option value="Agus Setiawan">Agus Setiawan</option>
+                                <option value="Ignasius Julio Sasi">Ignasius Julio Sasi</option>
+                                <option value="Joyo S.">Joyo S.</option>
+                                <option value="Agus Purwanto">Agus Purwanto</option>
+                            </select>
                         </div>
 
-                        <!-- INPUT BARU: Tanggal Pemeriksaan -->
                         <div class="mb-3">
                             <label for="tanggal" class="form-label">Tanggal Pemeriksaan</label>
                             <input type="date" class="form-control" id="tanggal" name="tanggal" required>
@@ -102,6 +110,11 @@
 
                 </div>
             </div>
+
+            <div class="footer-text">
+                2026 @ GUSPUR PPM LAI
+            </div>
+
         </div>
     </div>
 </div>
@@ -111,7 +124,6 @@
         document.getElementById('loading').style.display = 'block';
         document.getElementById('btnSubmit').disabled = true;
 
-        // 1. Ambil data dari form
         var formData = {
             petugas: formObject.petugas.value,
             tanggal: formObject.tanggal.value,
@@ -121,21 +133,17 @@
             keterangan: formObject.keterangan.value || "Aman"
         };
 
-        // 2. URL Web App Apps Script Anda
-        var webAppUrl = "https://script.google.com/macros/s/AKfycby9qw2E8Jtv6Nmo5yDhS6RrATbttC5_QOHApRUryzHWdeLQJann2e_tVqvwY3x7G2v6/exec";
+        var webAppUrl = "https://script.google.com/macros/s/AKfycbz4oIiMrly3zjoPmo7OsksryitKuudIoo7V98M6YjJevA2iWpnkbO8kKSNkRPSsfQIW/exec";
 
-        // 3. Kirim data menggunakan Fetch API (POST)
         fetch(webAppUrl, {
             method: "POST",
-            mode: "no-cors", // Dibutuhkan agar tidak terkena block CORS dari Google
+            mode: "no-cors",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(formData)
         })
         .then(function() {
-            // Karena menggunakan mode: "no-cors", kita tidak bisa membaca return json dari Google,
-            // tapi jika tidak ada error di catch, berarti data berhasil terkirim.
             document.getElementById('loading').style.display = 'none';
             document.getElementById('btnSubmit').disabled = false;
             
